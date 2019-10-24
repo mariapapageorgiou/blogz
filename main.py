@@ -44,15 +44,74 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
-        if user and user.password == password:
-            session['username']  = username
-            flash("Logged in")
-            return redirect('/main-blog')
-        else:
-            flash("User password incorrect or user does not exist", 'error')
+        user_error =''
+        password_error =''
 
-    return render_template('login.html')
+        user = User.query.filter_by(username=username).first()
+        # user_password = User.query.filter_by(password=password).first()
+        
+        # if username == '':
+        #     user_error = "Please input a username"
+        #     # return render_template ('login.html', user_error=user_error)
+        # if password == '':
+        #     password_error = "Please input a password"
+        #     # return render_template ('login.html', password_error=password_error)
+        
+       
+        # if existing_user.password != password:
+            
+        #     return render_template('login.html', password_error=password_error)
+
+        # if not user_error and not password_error:
+        #     session['username']  = username
+        #     flash("Logged in")
+        #     return redirect('/new-blog?username='+str(username))
+        # else:
+        #     return render_template('login.html', user_error=user_error, username=username, password_error=password_error)
+        
+    else:
+        return render_template('login.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @app.route('/login', methods=['POST', 'GET'])
+# def login():
+#     if request.method == 'POST':
+#         username = request.form['username']
+#         password = request.form['password']
+#         user_error =''
+#         password_error =''
+
+#         existing_user = User.query.filter_by(username=username).first()
+#         if existing_user:
+#             if not username == existing_user.username:
+#                 user_error="User input is wrong or does not exist"
+
+#             if not password == existing_user.password:
+#                 password_error="Password incorrect" 
+
+#             if not user_error or not password_error:                      
+#                 session['username']  = username
+#                 flash("Logged in")
+#                 return redirect('/new-blog?username='+str(username))
+#             else:
+#                 return render_template('login.html', username=username, password=password, user_error=user_error, password_error=password_error)
+#         else:
+#             return render_template('signup.html')
+#     return render_template('login.html')
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
@@ -91,17 +150,25 @@ def signup():
 @app.route('/logout')
 def logout():
     del session['username']
-    return redirect('/main-blog')
+    return redirect('/login')
 
-
-
-@app.route('/main-blog', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def index():
+
+    users = User.query.all()
+    return render_template('index.html', users=users)
+
+@app.route('/main-blog', methods=['POST', 'GET'])
+def main_blog():
+
+    user_id = str(request.args.get('user'))
+    owner = Blog.query.filter_by(id=user_id).first()
 
     blog_id = str(request.args.get('id'))
     new_blog = Blog.query.get(blog_id)
-    blogs = Blog.query.all()
-    return render_template('main-blog.html', blogs=blogs, new_blog=new_blog)
+    blogs = Blog.query.filter_by(owner=owner).all()
+    return render_template('main-blog.html', new_blog=new_blog, blogs=blogs)
+
 
 @app.route('/new-blog', methods=['POST', 'GET'])
 def create_blog_post():
@@ -118,7 +185,8 @@ def create_blog_post():
             body_post_error = "Input Body of Post"
         
         if not post_title_error and not body_post_error:
-            new_blog = Blog(post_title, body_post)
+            owner = User.query.filter_by(username=session['username']).first()
+            new_blog = Blog(post_title, body_post, owner)
             db.session.add(new_blog)
             db.session.commit()
             return redirect ('/main-blog?id='+str(new_blog.id)) 

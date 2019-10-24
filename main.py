@@ -48,70 +48,23 @@ def login():
         password_error =''
 
         user = User.query.filter_by(username=username).first()
-        # user_password = User.query.filter_by(password=password).first()
-        
-        # if username == '':
-        #     user_error = "Please input a username"
-        #     # return render_template ('login.html', user_error=user_error)
-        # if password == '':
-        #     password_error = "Please input a password"
-        #     # return render_template ('login.html', password_error=password_error)
-        
-       
-        # if existing_user.password != password:
+        if username =='':
+            user_error = 'Please input a username'
+            return render_template('login.html', user_error=user_error)
+        else:
+            if not user:
+                user_error = 'This is not an existing username/invalid input'
+            if not user.password == password or password=='':
+                password_error = 'Invalid password/Please input a password'
             
-        #     return render_template('login.html', password_error=password_error)
-
-        # if not user_error and not password_error:
-        #     session['username']  = username
-        #     flash("Logged in")
-        #     return redirect('/new-blog?username='+str(username))
-        # else:
-        #     return render_template('login.html', user_error=user_error, username=username, password_error=password_error)
-        
+            if not user_error and not password_error:
+                session['username']  = username
+                flash("Logged in")
+                return redirect('/new-blog?username='+str(username))
+            else:   
+                return render_template ('login.html', user_error=user_error, password_error=password_error, username=username)
     else:
         return render_template('login.html')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# @app.route('/login', methods=['POST', 'GET'])
-# def login():
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password = request.form['password']
-#         user_error =''
-#         password_error =''
-
-#         existing_user = User.query.filter_by(username=username).first()
-#         if existing_user:
-#             if not username == existing_user.username:
-#                 user_error="User input is wrong or does not exist"
-
-#             if not password == existing_user.password:
-#                 password_error="Password incorrect" 
-
-#             if not user_error or not password_error:                      
-#                 session['username']  = username
-#                 flash("Logged in")
-#                 return redirect('/new-blog?username='+str(username))
-#             else:
-#                 return render_template('login.html', username=username, password=password, user_error=user_error, password_error=password_error)
-#         else:
-#             return render_template('signup.html')
-#     return render_template('login.html')
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
@@ -152,6 +105,7 @@ def logout():
     del session['username']
     return redirect('/login')
 
+
 @app.route('/index', methods=['GET'])
 def index():
 
@@ -168,7 +122,6 @@ def main_blog():
     new_blog = Blog.query.get(blog_id)
     blogs = Blog.query.filter_by(owner=owner).all()
     return render_template('main-blog.html', new_blog=new_blog, blogs=blogs)
-
 
 @app.route('/new-blog', methods=['POST', 'GET'])
 def create_blog_post():
@@ -191,8 +144,7 @@ def create_blog_post():
             db.session.commit()
             return redirect ('/main-blog?id='+str(new_blog.id)) 
         else:
-            return render_template('new-blog-post.html', post_title_error=post_title_error, body_post_error=body_post_error) 
-           
+            return render_template('new-blog-post.html', post_title_error=post_title_error, body_post_error=body_post_error)          
     else:
         return render_template('new-blog-post.html')
 

@@ -12,8 +12,7 @@
         <h2>Available Blog Posts!</h2>
         <ul>
         {% for blog in blogs %}
-        <li><a href='/main-blog?id={{blog.id}}'>{{blog.name}}</a>
-        <br>{{blog.body}}</li>
+        <li><a href='/main-blog?id={{blog.id}}'>{{blog.name}}</a></li>
         {% endfor %}
         </ul>
     {% endif %} {% endif %}

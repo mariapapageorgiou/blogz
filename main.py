@@ -54,6 +54,7 @@ def login():
         else:
             if not user:
                 user_error = 'This is not an existing username/invalid input'
+                return render_template('login.html', user_error=user_error)
             if not user.password == password or password=='':
                 password_error = 'Invalid password/Please input a password'
             

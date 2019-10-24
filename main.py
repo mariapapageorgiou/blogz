@@ -97,7 +97,7 @@ def signup():
             else:
                 return render_template('signup.html', username=username, username_error=username_error, password=password, password_error = password_error, verify=verify, verify_error=verify_error)
         else:
-            return '<h1>Duplicate user</h1>'
+            return render_template('signup.html', username=username, username_error="Duplicate User")
 
     return render_template('signup.html')
 
